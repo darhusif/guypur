@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import *
+import pygame  
 
 class HamsterClicker(QWidget):
     def __init__(self):
@@ -8,14 +9,18 @@ class HamsterClicker(QWidget):
         self.setWindowTitle('Hamster Clicker')
         self.resize(700, 500)
         
-        # Основные переменные
+        
+        pygame.mixer.init()
+
+        
+        self.click_sound = pygame.mixer.Sound("click_sound.mp3") 
+        
         self.score = 0
         self.upgrade_cost = 100
         self.auto_click_increase = 1
         self.auto_click_active = False
-        self.end_cost = 1500  # Стоимость кнопки "Конец"
+        self.end_cost = 1500  
 
-        # Список доступных предметов магазина
         self.shop_items = [
             {"name": "Кепка", "message": "Кепка добавлена!", "cost": 150},
             {"name": "Очки", "message": "Очки добавлены!", "cost": 150},
@@ -59,6 +64,11 @@ class HamsterClicker(QWidget):
     def increase_score(self, event):
         self.score += 1
         self.update_score()
+        self.play_click_sound()  # Воспроизведение звука при клике
+
+    def play_click_sound(self):
+        """Проигрывание звука клика"""
+        self.click_sound.play()
 
     def update_score(self):
         self.score_label.setText(f"Монеты: {self.score}")
@@ -105,7 +115,7 @@ class HamsterClicker(QWidget):
         if self.score >= self.upgrade_cost:
             self.score -= self.upgrade_cost
             self.update_score()
-            self.auto_click_increase += 1
+            self.auto_click_increase += 4
             self.upgrade_cost += 50
             button.setText(f"Увеличить автоклик - {self.upgrade_cost} монет")
             if not self.auto_click_active:
@@ -135,6 +145,7 @@ class HamsterClicker(QWidget):
             self.close()
         else:
             QMessageBox.warning(self, "Ошибка", "Недостаточно денег для завершения игры!")
+
 
 if __name__ == "__main__":
     app = QApplication([])
